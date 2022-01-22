@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeatherProcast</title>
+    <link rel="stylesheet" href="./reset.css">
+    <script crossorigin='anonymous' src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.2.2/echarts.common.js"></script>
+    <script src="http://mockjs.com/dist/mock.js"></script>
+    <link rel="stylesheet" href="./iconfont4/iconfont.css">
+    <script>
+        window.onload=()=>{
+          const addbtn=document.getElementsByClassName("addfont")[0];
+          const cityname=document.getElementsByClassName("cityname")[0];
+          const info_about=document.getElementsByClassName("info_about")[0];
+          const textall=document.getElementsByClassName("textall")[0];
+          const tempall=document.getElementsByClassName("tempall")[0];
+          const wind=document.getElementsByClassName("wind")[0];
+          const tips=document.getElementsByClassName("tips")[0];
+          const leafa=document.getElementsByClassName("leafa")[0];
+          const line=document.getElementsByClassName("line")[0];
+          const todayTemp=document.getElementsByClassName("todayTemp")[0];
+          const todayWeather=document.getElementsByClassName("todayWeather")[0];
+          const tomorrowTemp=document.getElementsByClassName("tomorrowTemp")[0];
+          const tomorrowWeather=document.getElementsByClassName("tomorrowWeather")[0];
+          const today=document.getElementsByClassName("today")[0];
+          const sunset=document.getElementsByClassName("sunset")[0];
+          const hours=document.getElementsByClassName("hours")[0];
+          const daywind=document.getElementsByClassName("daywind")[0];
+          const daytemp=document.getElementsByClassName("daytemp")[0];
+          const tempmap=document.getElementsByClassName("tempmap")[0];
+          const cityinput=document.getElementsByClassName("cityinput")[0];
+          const main=document.getElementsByClassName("main")[0];
+          const nameinput=document.getElementsByClassName("nameinput")[0];
+          const returnmain=document.getElementsByClassName("returnmain")[0];
+          const nowcity=document.getElementsByClassName("nowcity")[0];
+          const hotcity1=document.getElementsByClassName("hotcity1")[0];
+          const hotcity2=document.getElementsByClassName("hotcity2")[0];
+          const hotcity3=document.getElementsByClassName("hotcity3")[0];
+          const hotcity4=document.getElementsByClassName("hotcity4")[0];
+          const hotcity5=document.getElementsByClassName("hotcity5")[0];
+          const hotcity6=document.getElementsByClassName("hotcity6")[0];
+          const hotcity7=document.getElementsByClassName("hotcity7")[0];
+          const addcities=document.getElementsByClassName("addcities")[0];
+          const cutcity=document.getElementsByClassName("cutcity")[0];
+          const weatherhistory=document.getElementsByClassName("weatherhistory")[0];
+          const weekday=document.getElementsByClassName("weekday")[0];
+          const weekdayicon=document.getElementsByClassName("weekdayicon")[0];
+          const weekdaymap=document.getElementsByClassName("weekdaymap")[0];
+          const weekdayweather=document.getElementsByClassName("weekdayweather")[0];
+          const weeknighticon=document.getElementsByClassName("weeknighticon")[0];
+          const weeknightmap=document.getElementsByClassName("weeknightmap")[0];
+          const weeknightweather=document.getElementsByClassName("weeknightweather")[0];
+          const weektext=document.getElementsByClassName("weektext")[0];
+          const weekwind=document.getElementsByClassName("weekwind")[0];
+          const weekwindspeed=document.getElementsByClassName("weekwindspeed")[0];
+          const righttodos=document.getElementsByClassName("righttodos")[0];
+          const footer=document.getElementsByClassName("footer")[0];
+          
+          //返回
+          returnmain.onclick=()=>{
+            cityinput.style.display="none";
+            main.style.display="block";
+          }
+          
+          //删除记录
+          cutcity.onclick=()=>{
+            addcities.innerHTML='';
+          } 
+
+          //搜索热门城市天气
+          hotcity1.onclick=()=>{
+            nameinput.value="北京";
+          }
+          hotcity2.onclick=()=>{
+            nameinput.value="上海";
+          }
+          hotcity3.onclick=()=>{
+            nameinput.value="广州";
+          }
+          hotcity4.onclick=()=>{
+            nameinput.value="深圳";
+          }
+          hotcity5.onclick=()=>{
+            nameinput.value="杭州";
+          }
+          hotcity6.onclick=()=>{
+            nameinput.value="沈阳";
+          }
+          hotcity7.onclick=()=>{
+            nameinput.value="大连";
+          }
+          
+
+          //搜索城市 
+          addbtn.onclick=()=>{
+              cityinput.style.display="block";
+              main.style.display="none";
+              
+              
+
+              nameinput.onblur=()=>{
+                 if(nameinput.value=='') alert("城市名不能为空");
+                 else{
+                 cityinput.style.display="none"; 
+                 main.style.display="block";
+                 weatherhistory.style.top="88px"; 
+                 righttodos.style.top="-30px";
+                 righttodos.style.display="flex";
+                 footer.style.top="-180px";
+                 footer.style.display="block";
+                 daywind.style.borderBottom=" 0px solid #fff";
+                 daytemp.style.borderBottom=" 1px solid #fff";
+                  //更换城市名字
+                 cityname.innerHTML='<span class="cityname">'+nameinput.value+'市</span>'
+                 nowcity.innerHTML=nameinput.value+'市'
+
+                 //增加城市记录
+                 addcities.innerHTML+='<div class="addcity">'+nameinput.value+'市</div>'
+
+                 axios.get('https://geoapi.qweather.com/v2/city/lookup?location='+nameinput.value+'&key=1ec89d0f08724176b5f4cfedb76a3eba').then((response)=>{
+                    //获取城市ID
+                    console.log(response.data)
+                    const cityid=response.data.location[0].id;
+                    axios.get('https://devapi.qweather.com/v7/weather/now?location='+cityid+'&key=1ec89d0f08724176b5f4cfedb76a3eba').then((response)=>{
+                    console.log(response.data.now);
+                    const nowweather=response.data.now
+                    //获取城市天气情况
+                    textall.innerHTML=nowweather.text;
+
+                    //获取城市温度
+                    tempall.innerHTML=nowweather.temp+'<span class="du">°</span>';
+
+                    //湿度
+                    wind.innerHTML=nowweather.windDir+nowweather.windScale+'级 湿度'+nowweather.humidity+'%';
+
+                    //提醒语
+                    if(Number(nowweather.temp)<=15&&Number(nowweather.temp)>=0){
+                        tips.innerHTML='天冷了，该加衣服了!';
+                    }
+                    else if(Number(nowweather.temp)>=25){
+                        tips.innerHTML='有点热了';
+                    }
+                    else if(Number(nowweather.temp)<0){
+                        tips.innerHTML='已经非常冷了,该穿羽绒服了!';
+                    }
+                    else{
+                        tips.innerHTML='天气适宜';
+                    }
+                    }).catch((error)=>{
+                        console.log(error);
+                    })
+                    
+                    //右边的小叶子
+                    axios.get('https://devapi.qweather.com/v7/air/now?location='+cityid+'&key=1ec89d0f08724176b5f4cfedb76a3eba').then((response)=>
+                    {
+                        console.log(response.data.now);
+                        const nowweather=response.data.now;
+                        //叶子里的空气情况
+                        if(nowweather.category.length==4){
+                            leafa.style.width="136px";
+                        }
+                        else{
+                            leafa.style.width="88px";
+                        }
+                    
+                        leafa.innerHTML='<span class="leafspan"><img src="./pictures/leaf.png" alt=""></span><span class="leaftext">'+nowweather.aqi+' '+nowweather.category+'</span>';
+                        const leafspan=document.getElementsByClassName("leafspan")[0];
+                        if(nowweather.category=="优"){
+                            leafspan.style.backgroundColor="#8fc31f";
+                        }
+                        else{
+                            leafspan.style.backgroundColor="#d7af0e";
+                        }
+                        
+                        //分隔线
+                        line.style.display="block";
+                        
+                    }).catch((error)=>
+                    {
+                        console.log(error);
+                    })
+
+                    //今明两天天气
+                    axios.get('https://devapi.qweather.com/v7/weather/3d?location='+cityid+'&key=1ec89d0f08724176b5f4cfedb76a3eba').then((response)=>{
+                          console.log(response.data.daily)
+                          const weatherArrs=response.data.daily;
+                          let todayiconfont="";let tomorrowiconfont="";
+                          switch(weatherArrs[0].textDay){
+                              case "晴":
+                                    todayiconfont="&#xe606;";
+                                    break;
+                              case "阴":
+                                    todayiconfont="&#xe609;";
+                                    break;
+                              case "多云":
+                                    todayiconfont="&#xe61c;";
+                                    break;
+                              case "小雨":
+                                    todayiconfont="&#xe68d;";
+                                    break;
+                              case "大雨":
+                                    todayiconfont="&#xe68f;";
+                                    break;
+                              case "雨夹雪":
+                                    todayiconfont="&#xe616;";
+                                    break;
+                              case "小雪":
+                                    todayiconfont="&#xe617;";
+                                    break;
+                              case "中雪":
+                                    todayiconfont="&#xe61f;";
+                                    break;
+                              case "大雪":
+                                    todayiconfont="&#xe6e8;";
+                                    break;
+                              case "中雨":
+                                    todayiconfont="&#xe6fd;";
+                                    break;
+                              case "阵雪":
+                                    todayiconfont="&#xe60e;";
+                                    break;
+                          }
+
+                          switch(weatherArrs[1].textDay){
+                              case "晴":
+                              tomorrowiconfont="&#xe606;";
+                                    break;
+                              case "阴":
+                              tomorrowiconfont="&#xe609;";
+                                    break;
+                              case "多云":
+                              tomorrowiconfont="&#xe61c;";
+                                    break;
+                              case "小雨":
+                              tomorrowiconfont="&#xe68d;";
+                                    break;
+                              case "大雨":
+                              tomorrowiconfont="&#xe68f;";
+                                    break;
+                              case "雨夹雪":
+                              tomorrowiconfont="&#xe616;";
+                                    break;
+                              case "小雪":
+                              tomorrowiconfont="&#xe617;";
+                                    break;
+                              case "中雪":
+                              tomorrowiconfont="&#xe61f;";
+                                    break;
+                              case "大雪":
+                              tomorrowiconfont="&#xe6e8;";
+                                    break;
+                              case "中雨":
+                              tomorrowiconfont="&#xe6fd;";
+                                    break;
+                              case "阵雪":
+                              tomorrowiconfont="&#xe60e;";
+                                    break;
+                          }
+                          //中间分隔线
+                          today.style.display="block";
+
+                          //获取今天的天气
+                          todayTemp.innerHTML='<span class="todaytext">今天</span><span class="todaynum">'+weatherArrs[0].tempMin+' / '+weatherArrs[0].tempMax+'°</span>';
+                          todayWeather.innerHTML='<span class="todayweatext">'+weatherArrs[0].textDay+'</span><span class="todayicon"><i class="iconfont">'+todayiconfont+'</i></span>';
+
+                          //获取明天的天气
+                          tomorrowTemp.innerHTML='<span class="tomorrowtext">明天</span><span class="tomorrownum">'+weatherArrs[1].tempMin+' / '+weatherArrs[1].tempMax+'°</span>';
+                          tomorrowWeather.innerHTML='<span class="tomorrowweatext">'+weatherArrs[1].textDay+'</span><span class="tomorrowicon"><i class="iconfont">'+tomorrowiconfont+'</i></span>';
+
+                          //获取日落时间
+                          sunset.innerHTML='日落 '+weatherArrs[0].sunset;
+
+                          //下拉框
+                          hours.innerHTML='24小时 <i class="iconfont pulldown">&#xe907;</i>';
+                          const pulldown=document.getElementsByClassName("pulldown")[0];
+
+                          //更换城市初始化
+                              sunset.style.display="inline-block";
+                              daytemp.style.display="none";
+                              daywind.style.display="none";
+                              pulldown.innerHTML="&#xe62a;"
+                              tempmap.style.display="none";
+                          pulldown.onclick=()=>{
+                              if(sunset.style.display=="inline-block"){
+                              sunset.style.display="none";
+                              daytemp.style.display="inline-block";
+                              daywind.style.display="inline-block";
+                              pulldown.innerHTML="&#xe630;"
+                              tempmap.style.display="inline-block";
+                              weatherhistory.style.top="198px";
+                              righttodos.style.top="110px";
+                              footer.style.top="-50px";
+                              }
+                              else{
+                              sunset.style.display="inline-block";
+                              daytemp.style.display="none";
+                              daywind.style.display="none";
+                              pulldown.innerHTML="&#xe62a;"
+                              tempmap.style.display="none";
+                              weatherhistory.style.top="88px";
+                              righttodos.style.top="-30px";
+                              footer.style.top="-180px";
+                              }
+                          }
+                        //console.log(weatherArrs[0].tempMax);
+                        //console.log(weatherArrs[0].tempMin);
+                        //温度折叠图
+                        let tempnums=[];
+                        for(let i=0;i<24;i++){
+                             tempnums[i]=parseInt(Math.random() * ((Number)(weatherArrs[0].tempMax)-(Number)(weatherArrs[0].tempMin)))+(Number)(weatherArrs[0].tempMin);
+                            while(i>0&&Math.abs(tempnums[i]-tempnums[i-1])>1){
+                             tempnums[i]=parseInt(Math.random() * ((Number)(weatherArrs[0].tempMax)-(Number)(weatherArrs[0].tempMin)))+(Number)(weatherArrs[0].tempMin);
+                            }
+                               
+                        }
+                        
+                    
+                        Mock.mock('http://www.weather',{"array|1": [
+                                                        tempnums
+                                                        ]})
+                        axios.get('http://www.weather').then((response)=>{
+
+                            //console.log(response.data);
+                            let nums=response.data.array;
+                            const myChart = echarts.init(tempmap);
+
+                            const option = {
+                            backgroundColor:'rgba(86,146,204)',
+                            grid:{
+                                left: '5%',
+                                right: '5%',
+                                top: '100%',
+                                containLabel: true
+                            },
+                            xAxis: {
+                            type: 'category',
+                            boundaryGap:false,
+                            axisLine: {
+                                lineStyle: {
+                                // 设置x轴颜色
+                                color: 'white'
+                                }
+                            },
+                            splitLine: {
+                                show:false,
+                                },
+                            data: ['0', '1', '2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23']
+                            },
+                            yAxis: {
+                                type: 'value',
+                                show:false,
+                                axisLabel:{
+                                 show:false,
+                                }
+                                
+                            },
+
+                            series: [
+                                {
+                                data: nums,
+                                type: 'line',
+                                lineStyle: {
+                                  normal: {
+                                      color: 'white',
+                                      width:1
+                                   }
+                                  },
+                                  symbol: 'circle',
+                                  symbolSize: 5, 
+                                  color:'white'
+                                }
+                            ]
+                            };
+                            myChart.clear();
+                            myChart.setOption(option);
+
+
+                       
+
+
+                        }).catch((error)=>{
+                            console.log(error);
+                        })
+
+
+                        //点击切换
+                        daytemp.onclick=()=>{
+                            daywind.style.borderBottom=" 0px solid #fff";
+                            daytemp.style.borderBottom=" 1px solid #fff";
+                            axios.get('http://www.weather').then((response)=>{
+
+                                //console.log(response.data);
+                                let nums=response.data.array;
+                                const myChart = echarts.init(tempmap);
+
+                                const option = {
+                                backgroundColor:'rgba(86,146,204)',
+                                grid:{
+                                    left: '5%',
+                                    right: '5%',
+                                    top: '100%',
+                                    containLabel: true
+                                },
+                                xAxis: {
+                                type: 'category',
+                                boundaryGap:false,
+                                axisLine: {
+                                    lineStyle: {
+                                    // 设置x轴颜色
+                                    color: 'white'
+                                    }
+                                },
+                                splitLine: {
+                                    show:false,
+                                    },
+                                data: ['0', '1', '2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23']
+                                },
+                                yAxis: {
+                                    type: 'value',
+                                    show:false,
+                                    axisLabel:{
+                                    show:false,
+                                    }
+                                    
+                                },
+
+                                series: [
+                                    {
+                                    data: nums,
+                                    type: 'line',
+                                    lineStyle: {
+                                    normal: {
+                                        color: 'white',
+                                        width:1
+                                    }
+                                    },
+                                    symbol: 'circle',
+                                    symbolSize: 5, 
+                                    color:'white'
+                                    }
+                                ]
+                                };
+                                myChart.clear();
+                                myChart.setOption(option);
+
+
+
+
+
+                                }).catch((error)=>{
+                                console.log(error);
+                                })
+                         }
+
+                        //风速折线图
+                        daywind.onclick=()=>{
+                        daywind.style.borderBottom=" 1px solid #fff";
+                        daytemp.style.borderBottom=" 0px solid #fff";
+
+                        let windnums=[];
+                        for(let i=0;i<24;i++){
+                             windnums[i]=parseInt(Math.random() * ((Number)(5)-(Number)(2)))+(Number)(2);
+                                 
+                        }
+                        
+                    
+                        Mock.mock('http://www.wind',{"array|1": [
+                                                        windnums
+                                                        ]})
+                        axios.get('http://www.wind').then((response)=>{
+
+                            //console.log(response.data);
+                            let nums=response.data.array;
+                            const myChart = echarts.init(tempmap);
+
+                            const option = {
+                            backgroundColor:'rgba(86,146,204)',
+                            grid:{
+                                left: '5%',
+                                right: '5%',
+                                top: '100%',
+                                containLabel: true
+                            },
+                            xAxis: {
+                            type: 'category',
+                            boundaryGap:false,
+                            axisLine: {
+                                lineStyle: {
+                                // 设置x轴颜色
+                                color: 'white'
+                                }
+                            },
+                            splitLine: {
+                                show:false,
+                                },
+                            data: ['0', '1', '2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23']
+                            },
+                            yAxis: {
+                                type: 'value',
+                                show:false,
+                                axisLabel:{
+                                 show:false,
+                                }
+                                
+                            },
+
+                            series: [
+                                {
+                                data: nums,
+                                type: 'line',
+                                lineStyle: {
+                                  normal: {
+                                      color: 'white',
+                                      width:1
+                                   }
+                                  },
+                                  symbol: 'circle',
+                                  symbolSize: 5, 
+                                  color:'white'
+                                }
+                            ]
+                            };
+                            myChart.clear();
+                            myChart.setOption(option);
+                        
+                         }).catch((error)=>{
+                            console.log(error);
+                         })
+                       }
+
+                          
+                         
+                    }).catch((error)=>{
+                        console.log(error);
+                    })
+                    
+                    //获取当前日期
+                    /* let time=new Date();
+                    let year=time.getUTCFullYear();
+                    let month=time.getUTCMonth()+1;
+                    let day=time.getUTCDate();
+                    if(month<10){month='0'+month;}
+                    let fulldate=year+month+day; */
+                    //console.log(fulldate);
+                    
+
+                    
+                    
+                 }).catch((error)=>{
+                     console.log(error);
+                 })
+                  
+                 //一周的情况 
+                 axios.get('https://www.yiketianqi.com/api/',{
+                     params:{
+                        appid:'57839886',
+                        appsecret:'CxfFnm5Y',
+                        version:'v9',
+                        city:nameinput.value
+                     }
+                 }).then((response)=>{
+                       console.log(response.data.data)
+                       let weatherall=response.data.data;
+                       weekday.innerHTML='<span>周'+weatherall[0].week.slice(2,3)+'</span> <span>周'+weatherall[1].week.slice(2,3)+'</span> <span>周'+weatherall[2].week.slice(2,3)+'</span> <span>周'+weatherall[3].week.slice(2,3)+'</span> <span>周'+weatherall[4].week.slice(2,3)+'</span> <span>周'+weatherall[5].week.slice(2,3)+'</span> <span>周'+weatherall[6].week.slice(2,3)+'</span>';
+                       weekdayweather.innerHTML='<div class="weekweatherDiv">'+weatherall[0].wea_day+'</div> <div class="weekweatherDiv">'+weatherall[1].wea_day+'</div> <div class="weekweatherDiv">'+weatherall[2].wea_day+'</div> <div class="weekweatherDiv">'+weatherall[3].wea_day+'</div> <div class="weekweatherDiv">'+weatherall[4].wea_day+'</div> <div class="weekweatherDiv">'+weatherall[5].wea_day+'</div> <div class="weekweatherDiv">'+weatherall[6].wea_day+'</div>';
+                       let icons={
+                           '晴':'&#xe606;',
+                           '阴':'&#xe609;',
+                           '多云':'&#xe61c',
+                           '小雨':'&#xe68d',
+                           '大雨':'&#xe68f',
+                           '小雪':'&#xe617',
+                           '雨夹雪':'&#xe616',
+                           '中雪':'&#xe61f;',
+                           '大雪':'&#xe6e8;',
+                           '中雨':'&#xe6fd;',
+                           '阵雪':'&#xe60e;'
+                       }
+                       weekdayicon.innerHTML='<i class="iconfont weekicon">'+icons[weatherall[0].wea_day]+'</i> <i class="iconfont weekicon">'+icons[weatherall[1].wea_day]+'</i> <i class="iconfont weekicon">'+icons[weatherall[2].wea_day]+'</i> <i class="iconfont weekicon">'+icons[weatherall[3].wea_day]+'</i> <i class="iconfont weekicon">'+icons[weatherall[4].wea_day]+'</i> <i class="iconfont weekicon">'+icons[weatherall[5].wea_day]+'</i> <i class="iconfont weekicon">'+icons[weatherall[6].wea_day]+'</i>'
+                       const weekdayChart = echarts.init(weekdaymap);
+                       const weekdayoption = {
+                            
+                            grid:{
+                                x:2,
+                                x2:2,
+                            
+                               
+                            },
+                            xAxis: {
+                            type: 'category',
+                            show:false,
+                            axisLine: {
+                                lineStyle: {
+                                // 设置x轴颜色
+                                color: 'white',
+
+                                }
+                            },
+                            splitLine: {
+                                show:false,
+                                },
+                            data: ['1','2','3','4','5','6','7']
+                            },
+                            yAxis: {
+                                type: 'value',
+                                show:false,
+                                axisLabel:{
+                                 show:false,
+                                }
+                                
+                            },
+
+                            series: [
+                                {
+                                data: [weatherall[0].tem1,weatherall[1].tem1,weatherall[2].tem1,weatherall[3].tem1,weatherall[4].tem1,weatherall[5].tem1,weatherall[6].tem1],
+                                type: 'line',
+                                label:{
+                                  show:true,
+                                  position:'top',
+                                  color:'#ffffff'
+                                },
+                                lineStyle: {
+                                  normal: {
+                                      color: 'white',
+                                      width:1
+                                   }
+                                  },
+                                  symbol: 'circle',
+                                  symbolSize: 5, 
+                                  color:'white'
+                                }
+                            ]
+                            };
+                            weekdayChart.clear();
+                            weekdayChart.setOption(weekdayoption); 
+
+
+                            const weeknightChart = echarts.init(weeknightmap);
+                            const weeknightoption = {
+                            
+                            grid:{
+                                x:2,
+                                x2:2,
+    
+                            },
+                            xAxis: {
+                            type: 'category',
+                            show:false,
+                            axisLine: {
+                                lineStyle: {
+                                // 设置x轴颜色
+                                color: 'white',
+
+                                }
+                            },
+                            splitLine: {
+                                show:false,
+                                },
+                            data: ['1','2','3','4','5','6','7']
+                            },
+                            yAxis: {
+                                type: 'value',
+                                show:false,
+                                axisLabel:{
+                                 show:false,
+                                }
+                                
+                            },
+
+                            series: [
+                                {
+                                data: [weatherall[0].tem2,weatherall[1].tem2,weatherall[2].tem2,weatherall[3].tem2,weatherall[4].tem2,weatherall[5].tem2,weatherall[6].tem2],
+                                type: 'line',
+                                label:{
+                                  show:true,
+                                  position:'bottom',
+                                  color:'#ffffff'
+                                },
+                                lineStyle: {
+                                  normal: {
+                                      color: 'white',
+                                      width:1
+                                   }
+                                  },
+                                  symbol: 'circle',
+                                  symbolSize: 5, 
+                                  color:'white'
+                                }
+                            ]
+                            };
+                            weeknightChart.clear();
+                            weeknightChart.setOption(weeknightoption);
+
+                            weeknightweather.innerHTML='<div class="weekweatherDiv">'+weatherall[0].wea_night+'</div> <div class="weekweatherDiv">'+weatherall[1].wea_night+'</div> <div class="weekweatherDiv">'+weatherall[2].wea_night+'</div> <div class="weekweatherDiv">'+weatherall[3].wea_night+'</div> <div class="weekweatherDiv">'+weatherall[4].wea_night+'</div> <div class="weekweatherDiv">'+weatherall[5].wea_night+'</div> <div class="weekweatherDiv">'+weatherall[6].wea_night+'</div>';
+                            weeknighticon.innerHTML='<i class="iconfont weekicon">'+icons[weatherall[0].wea_night]+'</i> <i class="iconfont weekicon">'+icons[weatherall[1].wea_night]+'</i> <i class="iconfont weekicon">'+icons[weatherall[2].wea_night]+'</i> <i class="iconfont weekicon">'+icons[weatherall[3].wea_night]+'</i> <i class="iconfont weekicon">'+icons[weatherall[4].wea_night]+'</i> <i class="iconfont weekicon">'+icons[weatherall[5].wea_night]+'</i> <i class="iconfont weekicon">'+icons[weatherall[6].wea_night]+'</i>'
+                            weektext.innerHTML='<div class="weektextaqi">'+weatherall[0].air_level+'</div> <div class="weektextaqi">'+weatherall[1].air_level+'</div> <div class="weektextaqi">'+weatherall[2].air_level+'</div> <div class="weektextaqi">'+weatherall[3].air_level+'</div> <div class="weektextaqi">'+weatherall[4].air_level+'</div> <div class="weektextaqi">'+weatherall[5].air_level+'</div> <div class="weektextaqi">'+weatherall[6].air_level+'</div>'
+                            const weektextaqi=document.getElementsByClassName("weektextaqi");
+                            for(let i=0;i<7;i++){
+                                if(weektextaqi[i].innerHTML=='优'){
+                                    weektextaqi[i].style.backgroundColor="#8fc31f";
+                                }
+                                if(weektextaqi[i].innerHTML.length==4){
+                                    weektextaqi[i].style.height="40px";
+                                }
+                            }
+                            weekwind.innerHTML='<div class="weekwindDiv">'+weatherall[0].win[0]+'</div><div class="weekwindDiv">'+weatherall[1].win[0]+'</div><div class="weekwindDiv">'+weatherall[2].win[0]+'</div><div class="weekwindDiv">'+weatherall[3].win[0]+
+                            '</div><div class="weekwindDiv">'+weatherall[4].win[0]+'</div><div class="weekwindDiv">'+weatherall[5].win[0]+'</div><div class="weekwindDiv">'+weatherall[6].win[0]+'</div>'
+
+                            weekwindspeed.innerHTML='<div class="weekwindspeedDiv">'+weatherall[0].win_speed.slice(weatherall[0].win_speed.length-2,weatherall[0].win_speed.length)+'</div><div class="weekwindspeedDiv">'+weatherall[1].win_speed.slice(weatherall[1].win_speed.length-2,weatherall[1].win_speed.length)+'</div><div class="weekwindspeedDiv">'+weatherall[2].win_speed.slice(weatherall[2].win_speed.length-2,weatherall[2].win_speed.length)+'</div><div class="weekwindspeedDiv">'+weatherall[3].win_speed.slice(weatherall[3].win_speed.length-2,weatherall[3].win_speed.length)+
+                            '</div><div class="weekwindspeedDiv">'+weatherall[4].win_speed.slice(weatherall[4].win_speed.length-2,weatherall[4].win_speed.length)+'</div><div class="weekwindspeedDiv">'+weatherall[5].win_speed.slice(weatherall[5].win_speed.length-2,weatherall[5].win_speed.length)+
+                            '</div><div class="weekwindspeedDiv">'+weatherall[6].win_speed.slice(weatherall[6].win_speed.length-2,weatherall[6].win_speed.length)+'</div>'
+                 }).catch((error)=>{
+                     console.log(error);
+                 })
+                
+              }
+          }
+        }
+        }
+    </script>
+</head>
+<style>
+    .main{
+        width: 640px;
+        margin: 0 auto;
+        background-color: rgba(13,90,165);
+        height: 2300px;
+    }
+
+    .header{
+        padding-top: 6px;
+        width: 640px;
+        text-align: center;
+    }
+    
+ 
+
+    .addfont{
+      font-size: 16px;
+      padding-right: 5px;
+    }
+
+    .cityname{
+        font-size: 16px;
+        color: #ffffff;
+    }
+    
+    .nameinput{
+        color: black;
+    }
+
+    .virus{
+        margin-left: 20px;
+        background-color: #336699;
+        width: 138px;
+        text-align: center;
+        font-size: 14px;
+        border-radius: 18px;
+        color: #ffffff;
+        display: inline-block;
+        height: 38px;
+        vertical-align: middle;
+        padding-top: 6px;
+    }
+
+    .virus img{
+        width: 26px;
+        margin-right: 8px;
+        height: 26px;
+       
+    }
+
+    .mask{
+        margin-left: 320px;
+        background-color: #336699;
+        width: 138px;
+        text-align: center;
+        font-size: 14px;
+        border-radius: 18px;
+        color: #ffffff;
+        display: inline-block;
+        height: 38px;
+        vertical-align: middle;
+        padding-top: 6px;
+    }
+
+    .mask img{
+        width: 26px;
+        margin-right: 8px;
+        height: 26px;
+       
+    }
+
+    .middle{
+        margin-top: 10px;
+    }
+    
+    .info_about{
+        margin-top: 60px;
+        position: relative;
+        
+    }
+
+    .textall{
+        margin-left: 12px;
+        color: #ffffff;
+        font-size: 20px;
+        height: 10px;
+        
+    }
+
+    .tempall{
+        margin-left: 10px;
+        width: 100px;
+        color: #ffffff;
+        font-size: 100px;
+        text-align:center;
+        margin-left: 5px;
+        line-height: 110px;
+    }
+
+    .du{
+        margin-left: 10px;
+        font-size: 50px;
+        vertical-align: super;
+    }
+
+    .wind{
+        margin-left: 10px;
+        color: #ffffff;
+        height: 15px;
+        line-height: 15px;
+        font-size: 14px;
+        width: 200px;
+       
+    }
+
+    .tips{
+        margin-left: 10px;
+        color: #ffffff;
+        height: 15px;
+        line-height: 15px;
+        font-size: 14px;
+        margin-top: 5px;
+        width: 200px;
+        
+    }
+
+   
+
+    .info_about a{
+        position: absolute;
+        top: 126px;
+        right: 10px;
+        background-color: rgba(0,0,0,.1);
+        width: 0;
+        text-align: center;
+        font-size: 14px;
+        border-radius: 18px;
+        color: #ffffff;
+        display: inline-block;
+        height: 33px;
+        vertical-align: middle;
+        padding-top: 6px;
+    }
+    
+    .info_about .leafspan{
+        position: absolute;
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        line-height: 25px;
+        border-radius:18px ;
+        top:3.8px;
+        left: 4.5px;
+    }
+  
+
+    .info_about img {
+        width: 15px;
+        height: 15px;
+    }
+
+    .info_about .leaftext{
+        position: absolute;
+        right: 20px;
+        top: 6px;
+    }
+
+    .info_about .line{
+        border-bottom: solid 2px rgba(255,255,255,.2);
+        margin-top: 6px;
+        display: none;
+    }
+    
+
+    .forecast{
+        position:relative;
+    }
+    .today{
+        left: 10px;
+        color: #ffffff;
+        position: absolute;
+        width: 315px;
+        height: 55px;
+        border-right: solid 2px rgba(255,255,255,.2);
+        display: none;
+    }
+    
+   
+
+    .todaytext{
+      position:absolute;
+      top: 5px;
+    }
+
+    .todaynum{
+      position:absolute;
+      right:10px ;
+      top: 5px;
+    }
+
+    .todayweatext{
+      position:absolute;
+      top: 33px;
+    }
+    
+    .todayicon{
+      position:absolute;
+      right: 10px;
+      top:28px
+    }
+
+    .today i{
+        font-size: 23px;
+    }
+
+    .tomorrow{
+        left: 330px;
+        color: #ffffff;
+        position: absolute;
+        width: 318px;
+        height: 55px;
+    }
+    
+    .tomorrowtext{
+      position:absolute;
+      top: 5px;
+      left: 3px;
+    }
+
+    .tomorrownum{
+      position:absolute;
+      right: 15px;
+      top: 5px;
+    }
+
+    .tomorrowweatext{
+      position:absolute;
+      top: 33px;
+      left: 3px;
+    }
+    
+    .tomorrowicon{
+      position:absolute;
+      right: 15px;
+      top:28px;
+    }
+
+    .tomorrowicon i{
+        font-size: 23px;
+    }
+
+    .allday{
+        color:#ffffff;
+        position: absolute;
+        top:60px;
+        height: 28px;
+        width: 640px;
+        background-color: rgba(86,146,204);
+        border-bottom: solid 2px rgba(255,255,255,.2);
+    }
+    .sunset{
+        margin-left: 10px;
+    }
+    .hours{
+        left: 570px;
+        position: absolute;
+    }
+    .daytemp{
+        margin-left: 10px;
+    }
+    
+    .tempmap{
+        position: absolute;
+        top:88px;
+        width: 640px;
+        height: 110px;
+        
+    }
+    
+
+    .cityinput{
+        position: relative;
+        width: 640px;
+        margin: 0 auto;
+        background-color: rgba(241,240,246);
+        height: 1000px;
+    }
+
+    .addcities, .hotcities{
+        display: flex;
+        margin-top: 30px;
+        flex-wrap: wrap;
+        
+        
+    }
+
+    .addcity, .hotcity{
+        height:36px;width:180px;
+        text-align: center;line-height: 36px;
+        border: 1px solid #e5e5e7;border-radius: 6px;
+        background: #fff;
+        margin-top: 10px;
+        margin-left: 15px;
+    }
+
+    .weatherhistory{
+        width: 640px;
+        height: 600px;
+        /* background-color: red; */
+        position: relative;
+        top: 88px;
+        color: #ffffff;
+        background-color: rgba(13,90,165);
+    }
+
+    .weekday{
+        position:absolute;
+        width: 640px;
+        height: 20px;
+        display: flex;
+        justify-content: space-around;
+        top: 10px;
+        
+    }
+
+    .weekdayweather{
+        position:absolute;
+        width: 640px;
+        height: 20px;
+        display: flex;
+        justify-content: space-around;
+        /* background-color: yellow; */
+        top:40px
+    }
+
+    .weekdayicon{
+        position:absolute;
+        width: 640px;
+        height: 25px;
+        display: flex;
+        justify-content: space-around;
+        /* background-color: chartreuse; */
+        top:70px
+    }
+
+    .weekdaymap{
+        position:absolute;
+        width: 640px;
+        height: 90px;
+        /* background-color: cyan; */
+        top:115px
+    }
+
+    .weeknightmap{
+        position:absolute;
+        width: 640px;
+        height:90px;
+        /* background-color: darkgreen; */
+        top:215px
+    }
+
+    .weeknighticon{
+        position:absolute;
+        width: 640px;
+        height: 25px;
+        display: flex;
+        justify-content: space-around;
+        /* background-color: darksalmon; */
+        top:315px
+    }
+
+    .weeknightweather{
+        position:absolute;
+        width: 640px;
+        height: 20px;
+        display: flex;
+        justify-content: space-around;
+        /* background-color: pink; */
+        top:350px
+    }
+
+    .weektext{
+        position:absolute;
+        width: 640px;
+        height: 20px;
+        display: flex;
+        justify-content: space-around;
+        /* background-color: pink; */
+        top:380px;
+        
+    }
+
+    .weekwind{
+        position:absolute;
+        width: 640px;
+        height: 20px;
+        display: flex;
+        justify-content: space-around;
+        top: 420px;
+    }
+
+    .weekwindspeed{
+        position:absolute;
+        width: 640px;
+        height: 20px;
+        display: flex;
+        justify-content: space-around;
+        top:440px
+    }
+
+    .weekweatherDiv{
+        width:70px;
+        text-align:center;
+    }
+
+    .weekicon{
+        font-size: 23px;
+    }
+
+    .weektextaqi{
+        width: 35px;
+        text-align: center;
+        height: 20px;
+        line-height: 20px;
+        border-radius: 8px;
+        background-color: #d7af0e;
+    }
+
+    .weekwindDiv{
+        width: 70px;
+        text-align: center;
+    }
+    .weekwindspeedDiv{
+        width: 28px;
+        text-align: center;
+    }
+    
+
+    .righttodos{
+        position:relative;
+        width: 640px;
+        height: 1300px;
+        display: flex;
+        flex-wrap: wrap; 
+        align-content:flex-start ;
+    }
+    
+    .righttodo{
+        width: 33.33%;
+        height: 113px;
+        line-height: 113px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,.2);
+    }
+    
+    .righttodotext{
+        color: #fff;
+        height: 20px;
+        line-height: 20px;
+        margin-top: -30px;
+    }
+
+    .footer{
+        position: relative;
+        width: 640px;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        top: -180px;
+        background: rgba(255,255,255,.2);
+        color: rgba(255,255,255,.5);
+    }
+</style>
+<body>
+    <div class="main">
+      <div class="header"><i class="iconfont addfont">&#xe726;</i><span class="cityname">重庆市</span></div>
+      <div class="middle">
+        <a class="virus"><img src="./pictures/yiqing.png" alt="">疫情资讯</a>
+        <a class="mask"><img src="./pictures/kouzhao.png" alt="">安全出行</a>
+      </div>
+      <div class="info_about">
+        <div class="textall"></div>
+        <div class="tempall"></div>
+        <p class="wind"></p>
+        <p class="tips"></p>   
+        <a class="leafa" href=""></a>
+        <div class="line"></div>
+      </div>
+      <div class="forecast">
+          <div class="today">
+            <div class="todayTemp"></div>
+            <div class="todayWeather"></div>
+          </div>
+
+          <div class="tomorrow">
+            <div class="tomorrowTemp"></div>
+            <div class="tomorrowWeather"></div>
+          </div>
+
+          <div class="allday">
+          <span class="sunset" style="display: inline-block;height: 27px;line-height: 27px;"></span>
+          <span class="daytemp" style="display: none;height: 27px;line-height: 27px;border-bottom: 1px solid #fff">温度</span>
+          <span class="daywind" style="display: none;height: 27px;line-height: 27px;">风力</span>
+          <span class="hours"></span> 
+          </div>
+          <div class="tempmap" style="display: none;"></div>
+
+      </div>
+
+          <div class="weatherhistory">
+            <div class="weekday"></div>
+            <div class="weekdayweather"></div>
+            <div class="weekdayicon"></div>
+            <div class="weekdaymap"></div>
+            <div class="weeknightmap"></div>
+            <div class="weeknighticon"></div>
+            <div class="weeknightweather"></div>
+            <div class="weektext"></div>
+            <div class="weekwind"></div>
+            <div class="weekwindspeed"></div>                
+          </div>
+
+          <div class="righttodos" style="display: none;">
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">约会 较适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">美发 一般</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">舒适度 较不舒适</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">路况 干燥</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/football.png" alt=""></div>
+                <div class="righttodotext">运动 不适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">逛街 较适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/fish.png" alt=""></div>
+                <div class="righttodotext">钓鱼 较适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">防晒 弱</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">雨伞 带伞</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">风寒 寒冷</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">心情 差</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">猫咪 不适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/cold.png" alt=""></div>
+                <div class="righttodotext">感冒 可能</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">狗狗 较适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">广场舞 不适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">放风筝 不宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">旅游 较适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">晨练 适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">晾晒 不宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/car.png" alt=""></div>
+                <div class="righttodotext">洗车 不宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/air.png" alt=""></div>
+                <div class="righttodotext">空气污染扩散 中</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">空调开启 开启制暖</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">中暑 不易中暑</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/road.png" alt=""></div>
+                <div class="righttodotext">交通 良好</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">划船 不适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/beauty.png" alt=""></div>
+                <div class="righttodotext">化妆 保湿</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">啤酒 不适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/star.png" alt=""></div>
+                <div class="righttodotext">夜生活 较适宜</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/clothes.png" alt=""></div>
+                <div class="righttodotext">穿衣 寒冷</div>
+            </div>
+            <div class="righttodo">
+                <div><img src="./pictures/sun.png" alt=""></div>
+                <div class="righttodotext">紫外线 最弱</div>
+            </div>
+        
+          </div>
+
+          <div class="footer" style="display: none;">
+                本页面由 <em style="font-weight: 700;padding: 0 15px;">墨迹天气</em> 提供  
+          </div>
+    </div>
+    <div class="cityinput" style="display: none;">
+        <i class="iconfont returnmain" style="font-size: 30px;position:absolute;top:10px;left: 10px;">&#xe660;</i>
+        <input type="text" class="nameinput" placeholder="请输入城市名" style="width: 570px;height: 47px;position:absolute;left: 50px;top:10px">
+        <div class="cities" style="position: absolute;top:70px;width: 640px;height: 100%;">
+            <div style="margin-left: 15px;color:rgba(85,85,85,.5)">当前城市</div>
+            <div class="nowcity" style="height:36px;width:180px;
+            margin-left: 15px;margin-top: 30px;text-align: center;line-height: 36px;
+            border: 1px solid #0ca2eb;border-radius: 6px;
+            background: #fff;">重庆市</div>
+            <div style="margin-left: 15px;margin-top: 30px;color:rgba(85,85,85,.5)"><span>添加记录</span> <span style="margin-left: 500px;display: inline-block;" class="cutcity">删除</span></div>
+            <div class="addcities">
+        
+            </div>
+
+            <div style="margin-left: 15px;margin-top: 30px;color:rgba(85,85,85,.5)">热搜城市</div>
+            <div class="hotcities">
+                <div class="hotcity1 hotcity">北京市</div>
+                <div class="hotcity2 hotcity">上海市</div>
+                <div class="hotcity3 hotcity">广州市</div>
+                <div class="hotcity4 hotcity">深圳市</div>
+                <div class="hotcity5 hotcity">杭州市</div>
+                <div class="hotcity6 hotcity">沈阳市</div>
+                <div class="hotcity7 hotcity">大连市</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
